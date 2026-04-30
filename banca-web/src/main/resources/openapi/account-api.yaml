@@ -1,0 +1,44 @@
+openapi: 3.0.1
+info:
+  title: Banca Web API
+  version: 1.0.0
+
+paths:
+# --- ACCOUNTS ---
+  /api/v1/accounts:
+    get:
+      operationId: getAccounts
+      responses: { '200': { description: 'Lista de cuentas' } }
+    post:
+      operationId: postAccounts
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Account' } }
+      responses: { '201': { description: 'Cuenta creada' } }
+  /api/v1/accounts/{id}:
+    put:
+      operationId: putAccounts
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Account' } }
+      responses: { '200': { description: 'Cuenta actualizada' } }
+    delete:
+      operationId: deleteAccounts
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '204': { description: 'Cuenta eliminada' } }
+
+components:
+  schemas:         
+    Account:
+      type: object
+      properties: 
+        id: { type: integer }
+        accountNumber: { type: string }
+        type: { type: string }
+        initialBalance: { type: number }
+        status: { type: boolean }
+        creationDate: { type: string, format: date }
+        updateDate: { type: string, format: date }
+        customerId: { type: integer } 
+         

@@ -1,0 +1,45 @@
+openapi: 3.0.1
+info:
+  title: Banca Web API
+  version: 1.0.0
+
+paths:
+  # --- CUSTOMERS ---
+  /api/v1/customers:
+    get:
+      operationId: getCustomers
+      responses: { '200': { description: 'Lista de clientes' } }
+    post:
+      operationId: postCustomers
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Customer' } }
+      responses: { '201': { description: 'Cliente creado' } }
+  /api/v1/customers/{id}:
+    put:
+      operationId: putCustomers
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Customer' } }
+      responses: { '200': { description: 'Cliente actualizado' } }
+    delete:
+      operationId: deleteCustomers
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '204': { description: 'Cliente eliminado' } }
+
+  
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties: 
+        id: { type: integer }
+        name: { type: string }
+        gender: { type: string }
+        identification: { type: string }
+        address: { type: string }
+        phone: { type: string }
+        password: { type: string }
+        status: { type: boolean }

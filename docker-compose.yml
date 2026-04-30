@@ -1,0 +1,56 @@
+services:
+  db-clientes:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    container_name: db-clientes
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cliente_app
+    volumes:
+      - ./mysql-init/BaseDatos-clientes.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  db-cuentas:
+    image: mysql:8.0
+    ports:
+      - "3307:3307"
+    container_name: db-cuentas
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: banca_db
+    volumes:
+      - ./mysql-init/BaseDatos.sql:/docker-entrypoint-initdb.d/init.sql
+    # AGREGADO: Healthcheck para la base de cuentas
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ms-clientes:
+    build: ./clientes-app
+    container_name: ms-clientes
+    ports: ["8081:8081"]
+    environment:
+      - DB_URL=r2dbc:mysql://db-clientes:3306/cliente_app
+    depends_on:
+      db-clientes:
+        condition: service_healthy
+
+  ms-cuentas:
+    build: ./banca-web
+    container_name: ms-cuentas
+    ports: ["8080:8080"]
+    environment:
+      - DB_URL=r2dbc:mysql://db-cuentas:3307/banca_db
+      - CLIENT_SERVICE_URL=http://ms-clientes:8081
+    depends_on:
+      db-cuentas:
+        condition: service_healthy
+      ms-clientes:
+        condition: service_started

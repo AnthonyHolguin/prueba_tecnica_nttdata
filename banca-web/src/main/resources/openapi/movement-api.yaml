@@ -1,0 +1,77 @@
+
+openapi: 3.0.1
+info:
+  title: Banca Web API
+  version: 1.0.0
+
+paths:
+  # --- MOVEMENTS ---
+  /api/v1/movements:
+    get:
+      operationId: getMovements
+      responses: { '200': { description: 'Lista de movimientos' } }
+    post:
+      operationId: postMovements
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Movement' } }
+      responses: { '201': { description: 'Movimiento registrado' } }
+  /api/v1/movements/{id}:
+    put:
+      operationId: putMovements
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Movement' } }
+      responses: { '200': { description: 'Movimiento actualizado' } }
+    delete:
+      operationId: deleteMovements
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '204': { description: 'Movimiento eliminado' } }
+  /api/v1/movements/reports:
+    get:
+      operationId: getReport
+      summary: Obtiene el reporte de movimientos por rango de fechas
+      parameters:
+        - name: accountNumber
+          in: query
+          required: true
+          schema: { type: string }
+        - name: startDate
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: endDate
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Reporte generado exitosamente
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccountReport' }
+components:
+  schemas:
+    Movement:
+      type: object
+      properties: 
+        id: { type: integer }
+        date: { type: string, format: date }
+        type: { type: string }
+        value: { type: number }
+        balance: { type: number }
+        accountNumber: { type: string }
+        accountId: { type: integer }
+    AccountReport:
+      type: object
+      properties:
+        date: { type: string, format: date }
+        accountNumber: { type: string }
+        accountHolder: { type: string }
+        accountType: { type: string }
+        initialBalance: { type: number }
+        status: { type: boolean }
+        movements:
+          type: array
+          items: { $ref: '#/components/schemas/Movement' }

@@ -1,0 +1,61 @@
+openapi: 3.0.1
+info:
+  title: Clientes App API
+  version: 1.0.0
+
+paths:
+  # --- CUSTOMERS ---
+  /api/v1/customers:
+    get:
+      operationId: getCustomers
+      responses: { '200': { description: 'Lista de clientes', content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Customer' } } } } } }
+    post:
+      operationId: postCustomers
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Customer' } }
+      responses: { '201': { description: 'Cliente creado' } }
+  /api/v1/customers/{id}:
+    get:
+      operationId: getCustomersById
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '200': { description: 'Cliente obtenido', content: { application/json: { schema: { $ref: '#/components/schemas/Customer' } } } } }
+    put:
+      operationId: putCustomers
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Customer' } }
+      responses: { '200': { description: 'Cliente actualizado' } }
+    delete:
+      operationId: deleteCustomers
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { '204': { description: 'Cliente eliminado' } }
+
+components:
+  schemas:
+    # Definición de la clase base Persona 
+    Person:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        gender: { type: string }
+        identification: { type: string }
+        address: { type: string }
+        phone: { type: string }
+    
+    # Definición de Cliente que hereda de Persona 
+    Customer:
+      allOf:
+        - $ref: '#/components/schemas/Person'
+        - type: object
+          properties:
+            id: { type: integer }
+            password: { type: string }
+            personId: { type: integer }
+            status: { type: boolean }
+            # ... resto de campos
+      # Esto ayuda al generador a entender la jerarquía
+      discriminator:
+        propertyName: type
