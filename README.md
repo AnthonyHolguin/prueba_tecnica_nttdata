@@ -3,7 +3,7 @@ Prueba técnica destinada a evaluar las habilidades y conocimientos de los  cand
 
 # Para levantar el proyecto se necesita docker
 
-se copmpila cada proyecto desde su carpeta con ./mvnw.cmd clean package -DskipTests
+se compila cada proyecto desde su carpeta con ./mvnw.cmd clean package -DskipTests
 Tambien puede ser mvn clean package -DskipTests
 
 El programa de docker debe estar iniciado.
