@@ -14,14 +14,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.ReportUseCase;
+import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.DeleteMovementUseCase;
 import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.GetMovementUseCase;
 import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.MovementUseCase;
-import com.anthony.prueba.tecnica.webapp.banca_web.domain.repository.MovementRepository;
+import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.PutMovementUseCase;
 import com.anthony.prueba.tecnica.webapp.banca_web.model.movement.Movement;
 
 import reactor.core.publisher.Flux;
@@ -29,6 +31,7 @@ import reactor.core.publisher.Mono;
 
 @WebFluxTest(MovementControllers.class)
 @DisplayName("MovementController Integration Tests")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class MovementControllerIntegrationTest {
 
     @Autowired
@@ -36,6 +39,14 @@ class MovementControllerIntegrationTest {
 
     @MockitoBean
     private GetMovementUseCase getMovementUseCase;
+
+    @MockitoBean
+    private DeleteMovementUseCase deleteMovementUseCase;
+
+    @MockitoBean
+    private PutMovementUseCase putMovementUseCase;
+
+    
 
     @MockitoBean
     private MovementUseCase movementUseCase;
@@ -116,8 +127,8 @@ void testGetMovements_Success() {
         updatedMovement.setValue(new BigDecimal("600.00"));
         updatedMovement.setType("DEPOSITO");
 
-        when(movementRepository.save(any(Movement.class)))
-            .thenReturn(Mono.just(updatedMovement));
+        when(putMovementUseCase.execute(any(Movement.class)))
+            .thenReturn(Mono.empty());
 
         webTestClient.put()
             .uri("/api/v1/movements/{id}", 1)
@@ -130,7 +141,7 @@ void testGetMovements_Success() {
     @Test
     @DisplayName("DELETE /api/v1/movements/{id} - Debe eliminar movimiento y retornar 204 NO CONTENT")
     void testDeleteMovements_Success() {
-        when(movementRepository.deleteById(1))
+        when(deleteMovementUseCase.execute(1))
             .thenReturn(Mono.empty());
 
         webTestClient.delete()
@@ -142,7 +153,7 @@ void testGetMovements_Success() {
     @Test
     @DisplayName("GET /api/v1/movements - Debe retornar 500 en caso de error en repositorio")
     void testGetMovements_InternalServerError() {
-        when(movementRepository.findAll())
+        when(getMovementUseCase.execute())
             .thenReturn(Flux.error(new RuntimeException("Database error")));
 
         webTestClient.get()
@@ -169,7 +180,7 @@ void testGetMovements_Success() {
     @Test
     @DisplayName("DELETE /api/v1/movements/{id} - Debe retornar 500 cuando falla la eliminación")
     void testDeleteMovements_InternalServerError() {
-        when(movementRepository.deleteById(1))
+        when(deleteMovementUseCase.execute(1))
             .thenReturn(Mono.error(new RuntimeException("Delete failed")));
 
         webTestClient.delete()
@@ -181,7 +192,7 @@ void testGetMovements_Success() {
     @Test
     @DisplayName("PUT /api/v1/movements/{id} - Debe retornar 500 cuando falla la actualización")
     void testPutMovements_InternalServerError() {
-        when(movementRepository.save(any(Movement.class)))
+        when(putMovementUseCase.execute(any(Movement.class)))
             .thenReturn(Mono.error(new RuntimeException("Update failed")));
 
         webTestClient.put()
@@ -195,7 +206,7 @@ void testGetMovements_Success() {
     @Test
     @DisplayName("GET /api/v1/movements - Debe retornar 200 cuando no hay movimientos")
     void testGetMovements_EmptyList() {
-        when(movementRepository.findAll())
+        when(getMovementUseCase.execute())
             .thenReturn(Flux.empty());
 
         webTestClient.get()
