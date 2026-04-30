@@ -13,5 +13,9 @@ Utilicé springdoc-openapi-starter-webflux-ui con el fin de generar el archivo Y
 
 nttdata.postman_collection es una colección de postman de las pruebas que hice a los services
 
+Usé Java 17.0.18
+En clientes-app usé spring 4.0.6
+En banca-web usé spring 3.4.1
+
 
 
