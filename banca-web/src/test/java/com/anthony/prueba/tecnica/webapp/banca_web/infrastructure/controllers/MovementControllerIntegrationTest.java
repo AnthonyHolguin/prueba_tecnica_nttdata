@@ -30,7 +30,7 @@ import reactor.core.publisher.Mono;
 @WebFluxTest(MovementControllers.class)
 @DisplayName("MovementController Integration Tests")
 class MovementControllerIntegrationTest {
-/**
+
     @Autowired
     private WebTestClient webTestClient;
 
@@ -214,5 +214,5 @@ void testGetMovements_Success() {
             .bodyValue("{invalid json")
             .exchange()
             .expectStatus().isBadRequest();
-    } */
+    }
 }
