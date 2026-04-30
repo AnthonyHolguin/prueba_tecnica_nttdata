@@ -27,8 +27,8 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public Flux<Account> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+         return springDataAccountRepository.findAll()
+            .map(MapUtil::toDomain);
     }
 
     @Override

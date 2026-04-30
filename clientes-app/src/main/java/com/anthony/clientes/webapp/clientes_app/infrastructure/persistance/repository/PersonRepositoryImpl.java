@@ -4,7 +4,6 @@ import org.springframework.stereotype.Repository;
 
 import com.anthony.clientes.webapp.clientes_app.common.MapUtil;
 import com.anthony.clientes.webapp.clientes_app.domain.repository.PersonRepository;
-import com.anthony.clientes.webapp.clientes_app.infrastructure.persistance.entity.CustomerEntity;
 import com.anthony.clientes.webapp.clientes_app.infrastructure.persistance.entity.PersonEntity;
 import com.anthony.clientes.webapp.clientes_app.infrastructure.persistance.repository.springdata.SpringDataPersonRepository;
 import com.anthony.clientes.webapp.clientes_app.model.customer.Person;

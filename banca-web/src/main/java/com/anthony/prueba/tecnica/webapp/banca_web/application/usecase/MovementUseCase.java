@@ -6,11 +6,9 @@ import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.anthony.prueba.tecnica.webapp.banca_web.common.MapUtil;
 import com.anthony.prueba.tecnica.webapp.banca_web.domain.exception.InsufficientBalanceException;
 import com.anthony.prueba.tecnica.webapp.banca_web.domain.repository.AccountRepository;
 import com.anthony.prueba.tecnica.webapp.banca_web.domain.repository.MovementRepository;
-import com.anthony.prueba.tecnica.webapp.banca_web.model.account.Account;
 import com.anthony.prueba.tecnica.webapp.banca_web.model.movement.Movement;
 
 import lombok.RequiredArgsConstructor;

@@ -13,13 +13,17 @@ import org.springframework.web.server.ServerWebExchange;
 
 import com.anthony.prueba.tecnica.webapp.banca_web.api.movement.ApiApi;
 import com.anthony.prueba.tecnica.webapp.banca_web.application.report.AccountReport;
+import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.DeleteMovementUseCase;
+import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.GetMovementUseCase;
 import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.MovementUseCase;
+import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.PutMovementUseCase;
 import com.anthony.prueba.tecnica.webapp.banca_web.domain.repository.MovementRepository;
 import com.anthony.prueba.tecnica.webapp.banca_web.model.movement.Movement;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -28,26 +32,25 @@ public class MovementControllers implements ApiApi {
 
     private final ReportUseCase reportUseCase;
     private final MovementUseCase movementUseCase;
-    private final MovementRepository movementRepository;
- 
+    private final GetMovementUseCase getMovementUseCase;
+    private final DeleteMovementUseCase deleteMovementUseCase;
+    private final PutMovementUseCase putMovementUseCase;
     
     @Override
-    public Mono<ResponseEntity<Void>> getMovements(ServerWebExchange exchange) {    
-        return movementRepository.findAll()
-            .then(Mono.just(ResponseEntity.ok().<Void>build()))
-            .onErrorReturn(ResponseEntity.status(500).build());
+    public Mono<ResponseEntity<Flux<Movement>>> getMovements(ServerWebExchange exchange) {    
+        return Mono.just(ResponseEntity.ok(getMovementUseCase.execute()));
     }   
     
     @Override
-    public Mono<ResponseEntity<Void>> postMovements(@Valid Mono<Movement> movementMono, ServerWebExchange exchange) {    
+    public Mono<ResponseEntity<Flux<Movement>>> postMovements(@Valid Mono<Movement> movementMono, ServerWebExchange exchange) {    
       return movementMono 
             .flatMap(movementUseCase::execute) 
-            .map(savedMovement -> ResponseEntity.status(HttpStatus.CREATED).build());
+            .map(savedMovement -> ResponseEntity.status(HttpStatus.CREATED).body(Flux.just(savedMovement)));
     }
 
     @Override
     public Mono<ResponseEntity<Void>> deleteMovements(Integer id, ServerWebExchange exchange) {
-        return movementRepository.deleteById(id)
+        return deleteMovementUseCase.execute(id)
             .then(Mono.just(ResponseEntity.noContent().<Void>build()))
             .onErrorReturn(ResponseEntity.status(500).build());
     }
@@ -59,7 +62,7 @@ public class MovementControllers implements ApiApi {
                 movement.setId(id);
                 return movement;
             })
-            .flatMap(movementRepository::save)
+            .flatMap(putMovementUseCase::execute)
             .map(updatedMovement -> ResponseEntity.ok().<Void>build())
             .onErrorReturn(ResponseEntity.status(500).build());
     }

@@ -7,27 +7,33 @@ import org.springframework.web.server.ServerWebExchange;
 
 import com.anthony.prueba.tecnica.webapp.banca_web.api.account.ApiApi;
 import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.AccountUseCase;
+import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.GetAccountUseCase;
+import com.anthony.prueba.tecnica.webapp.banca_web.domain.repository.AccountRepository;
 import com.anthony.prueba.tecnica.webapp.banca_web.model.account.Account;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
 public class AccountController implements ApiApi {
     private final AccountUseCase accountUseCase;
+    private final GetAccountUseCase getAccountUseCase;
     @Override
-    public Mono<ResponseEntity<Void>> getAccounts(ServerWebExchange exchange) {
-        // TODO Auto-generated method stub
-        return ApiApi.super.getAccounts(exchange);
+    public Mono<ResponseEntity<Flux<Account>>> getAccounts(ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(getAccountUseCase.execute()));
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> postAccounts(@Valid Mono<Account> account, ServerWebExchange exchange) {
-        return account 
-            .flatMap(accountUseCase::execute) 
-            .map(savedAccount -> ResponseEntity.status(HttpStatus.CREATED).build());
+    public Mono<ResponseEntity<Flux<Account>>> postAccounts(@Valid Mono<Account> account, ServerWebExchange exchange) {
+        return account
+        .flatMap(accountUseCase::execute) 
+        .map(savedAccount -> 
+            ResponseEntity.status(HttpStatus.CREATED) 
+                .body(Flux.just(savedAccount))       
+        );
     
     }
 

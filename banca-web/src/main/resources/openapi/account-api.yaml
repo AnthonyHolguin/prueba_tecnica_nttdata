@@ -8,13 +8,28 @@ paths:
   /api/v1/accounts:
     get:
       operationId: getAccounts
-      responses: { '200': { description: 'Lista de cuentas' } }
+      responses: 
+        '200': 
+          description: 'Lista de cuentas'
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Account' }
     post:
       operationId: postAccounts
       requestBody:
         content:
           application/json: { schema: { $ref: '#/components/schemas/Account' } }
-      responses: { '201': { description: 'Cuenta creada' } }
+      responses: 
+        '201':
+          description: 'Cuenta creada exitosamente'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
   /api/v1/accounts/{id}:
     put:
       operationId: putAccounts

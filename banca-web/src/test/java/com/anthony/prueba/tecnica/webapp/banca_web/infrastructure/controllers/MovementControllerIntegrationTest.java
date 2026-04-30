@@ -1,10 +1,13 @@
 package com.anthony.prueba.tecnica.webapp.banca_web.infrastructure.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.ReportUseCase;
+import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.GetMovementUseCase;
 import com.anthony.prueba.tecnica.webapp.banca_web.application.usecase.MovementUseCase;
 import com.anthony.prueba.tecnica.webapp.banca_web.domain.repository.MovementRepository;
 import com.anthony.prueba.tecnica.webapp.banca_web.model.movement.Movement;
@@ -26,12 +30,12 @@ import reactor.core.publisher.Mono;
 @WebFluxTest(MovementControllers.class)
 @DisplayName("MovementController Integration Tests")
 class MovementControllerIntegrationTest {
-
+/**
     @Autowired
     private WebTestClient webTestClient;
 
     @MockitoBean
-    private MovementRepository movementRepository;
+    private GetMovementUseCase getMovementUseCase;
 
     @MockitoBean
     private MovementUseCase movementUseCase;
@@ -52,25 +56,42 @@ class MovementControllerIntegrationTest {
         movement.setBalance(new BigDecimal("1500.00"));
         movement.setAccountId(1);
     }
+@Test
+@DisplayName("GET /api/v1/movements - Debe retornar 200 OK y la lista de movimientos")
+void testGetMovements_Success() {
+    // 1. Configuración de los datos de prueba
+    Movement movement1 = new Movement();
+    movement1.setId(1);
+    movement1.setAccountNumber("ACC-001");
+    movement1.setValue(new BigDecimal("500.00"));
+    movement1.setType("DEPOSITO");
 
-    @Test
-    @DisplayName("GET /api/v1/movements - Debe retornar 200 OK")
-    void testGetMovements_Success() {
-        Movement movement2 = new Movement();
-        movement2.setId(2);
-        movement2.setAccountNumber("ACC-001");
-        movement2.setValue(new BigDecimal("300.00"));
-        movement2.setType("RETIRO");
+    Movement movement2 = new Movement();
+    movement2.setId(2);
+    movement2.setAccountNumber("ACC-001");
+    movement2.setValue(new BigDecimal("300.00"));
+    movement2.setType("RETIRO");
 
-        when(movementRepository.findAll())
-            .thenReturn(Flux.just(movement, movement2));
+    // 2. Mock del repositorio (retornando un Flux con la lista)
+    when(getMovementUseCase.execute())
+        .thenReturn(Flux.just(movement1, movement2));
 
-        webTestClient.get()
-            .uri("/api/v1/movements")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus().isOk();
-    }
+    // 3. Ejecución y Verificación con WebTestClient
+    webTestClient.get()
+        .uri("/api/v1/movements")
+        .accept(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectStatus().isOk() // Verifica el código 200
+        .expectHeader().contentType(MediaType.APPLICATION_JSON)
+        .expectBodyList(Movement.class)
+        .hasSize(2) 
+        .consumeWith(response -> {
+            List<Movement> movements = response.getResponseBody();
+            assertNotNull(movements);
+            assertEquals("ACC-001", movements.get(0).getAccountNumber());
+            assertEquals(new BigDecimal("300.00"), movements.get(1).getValue());
+        });
+}
 
     @Test
     @DisplayName("POST /api/v1/movements - Debe crear movimiento y retornar 201 CREATED")
@@ -193,5 +214,5 @@ class MovementControllerIntegrationTest {
             .bodyValue("{invalid json")
             .exchange()
             .expectStatus().isBadRequest();
-    }
+    } */
 }

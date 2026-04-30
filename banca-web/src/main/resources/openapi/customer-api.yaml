@@ -8,7 +8,14 @@ paths:
   /api/v1/customers:
     get:
       operationId: getCustomers
-      responses: { '200': { description: 'Lista de clientes' } }
+      responses: 
+        '200': 
+          description: 'Lista de clientes'
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Customer' }
     post:
       operationId: postCustomers
       requestBody:

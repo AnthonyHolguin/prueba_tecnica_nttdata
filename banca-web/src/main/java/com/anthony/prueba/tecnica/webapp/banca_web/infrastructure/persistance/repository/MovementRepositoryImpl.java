@@ -31,10 +31,7 @@ public class MovementRepositoryImpl implements MovementRepository {
     @Override
     public Flux<Movement> findAll() {
         return springRepository.findAll()
-        .flatMap(movementEntity -> {
-            Movement movement = MapUtil.toDomain(movementEntity);
-            return Mono.just(movement);
-        });
+            .map(MapUtil::toDomain);
     }
 
     @Override

@@ -9,13 +9,28 @@ paths:
   /api/v1/movements:
     get:
       operationId: getMovements
-      responses: { '200': { description: 'Lista de movimientos' } }
+      responses: 
+        '200': 
+          description: 'Lista de movimientos'
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Movement' }
     post:
       operationId: postMovements
       requestBody:
         content:
           application/json: { schema: { $ref: '#/components/schemas/Movement' } }
-      responses: { '201': { description: 'Movimiento registrado' } }
+      responses: 
+        '201':
+          description: 'Movimiento creado exitosamente'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movement'
   /api/v1/movements/{id}:
     put:
       operationId: putMovements
